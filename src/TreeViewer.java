@@ -1,9 +1,6 @@
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,6 +8,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.SwingWorker;
 
@@ -32,21 +31,19 @@ public class TreeViewer{
   private long prevTime=0;
   private int totalTime=0;
   
+  String rootName;
+  
+  public ArrayList<String> iconNames;
+  
   class TreeWorker extends SwingWorker<Void, Integer> implements PropertyChangeListener{
 
     public Void doInBackground() {
-      prevTime=System.currentTimeMillis();
-      
       treeData=getTree();
       return null;
     }
     
     public void done(){
-      if(treeData!=null){
-        DirNode root=new DirNode("root", treeData);
-        window.tree.setData(root);
-        window.scrollPane.setViewportView(window.tree);
-      }
+      loadTreeIntoWindow();
     }
     
     public ArrayList<TreeNode> getTree(){
@@ -79,6 +76,7 @@ public class TreeViewer{
     public String readJSON(String file){
       String doc = "", path; 
       path="json/"+file+".json";
+      rootName=file;
       
       try {
         Path filePath = Paths.get(path);
@@ -118,6 +116,7 @@ public class TreeViewer{
         else{
           FileNode file=gson.fromJson(json, FileNode.class);
           tree.add(file);
+          iconNames.add(getIconFromNode(file.icon));
         }
       }
       
@@ -159,8 +158,11 @@ public class TreeViewer{
     }
   }
   
+// ----------------------------------------- TreeViewer class methods -----------------------------------------  
+  
   public TreeViewer(){
     window=TreeViewerFrame.window;
+    iconNames=new ArrayList<String>();
   }
     
   public void showTree(){
@@ -168,5 +170,36 @@ public class TreeViewer{
     worker.addPropertyChangeListener(worker);
     worker.execute();
   }
-
+  
+  public void loadTreeIntoWindow(){
+    if(treeData!=null){
+      DirectoryTree tree=window.tree;
+      
+      DirNode root=new DirNode(rootName, treeData);
+      
+      tree=new DirectoryTree(iconNames);
+      tree.setData(root);
+      tree.setTreeOptions(tree);
+      
+      window.scrollPane.setViewportView(tree);
+    }
+  }
+  
+  public static String getIconFromNode(String iconPath){
+    String icon=null;
+    
+    Pattern pat=Pattern.compile("/[^/]+\\.[^/.]+$");
+    Matcher mat=pat.matcher(iconPath);
+    
+    if(mat.find()){
+      icon=mat.group();                                      
+      icon=icon.substring(1);
+    }
+    else{
+      icon="file.png";
+    }
+    
+    return icon;
+  }
+  
 }

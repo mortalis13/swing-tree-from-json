@@ -89,7 +89,6 @@ public class TreeViewerFrame {
       @Override
       public void windowOpened(WindowEvent e) {
         treeViewer=new TreeViewer();
-        tree=new DirectoryTree();
       }
     });
     frame.setBounds(100, 100, 577, 503);

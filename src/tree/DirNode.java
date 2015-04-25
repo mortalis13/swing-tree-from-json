@@ -9,7 +9,4 @@ public class DirNode extends TreeNode{
     this.children = children;
   }
   
-  public String toString(){
-    return text;
-  }
 }

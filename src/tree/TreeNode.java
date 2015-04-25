@@ -9,4 +9,8 @@ public class TreeNode {
   public TreeNode(String text){
     this.text=text;
   }
+  
+  public String toString(){
+    return text;
+  }
 }

@@ -8,7 +8,4 @@ public class FileNode extends TreeNode{
     this.icon=icon;
   }
   
-  public String toString(){
-    return text;
-  }
 }
