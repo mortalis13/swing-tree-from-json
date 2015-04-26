@@ -2,13 +2,15 @@ import java.util.ArrayList;
 
 import javax.swing.Icon;
 import javax.swing.JTree;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 
 import tree.TreeNode;
 
 
-public class DirectoryTree extends JTree {
+public class DirectoryTree extends JTree implements TreeWillExpandListener{
   ArrayList<String> iconNames;
   
   public DirectoryTree(ArrayList<String> iconNames){
@@ -25,11 +27,15 @@ public class DirectoryTree extends JTree {
     Icon nodeIcon = null;
     
     getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+    setToggleClickCount(1);
+    addTreeWillExpandListener(this);
+    setShowsRootHandles(true);
     
     renderer=new DirectoryRenderer(iconNames);
     setCellRenderer(renderer);
-    
-    setShowsRootHandles(true);
   }
+  
+  public void treeWillExpand(TreeExpansionEvent e){ }
+  public void treeWillCollapse(TreeExpansionEvent e) { }
   
 } 

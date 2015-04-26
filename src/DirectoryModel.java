@@ -24,6 +24,8 @@ public class DirectoryModel implements TreeModel {
   }
 
   public int getChildCount(Object parent) {
+    if(!(parent instanceof DirNode)) return 0;
+    
     DirNode dir = (DirNode) parent;
     return dir.children.size();
   }

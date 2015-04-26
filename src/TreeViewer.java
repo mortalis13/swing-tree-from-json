@@ -32,6 +32,7 @@ public class TreeViewer{
   private int totalTime=0;
   
   String rootName;
+  String path;
   
   public ArrayList<String> iconNames;
   
@@ -50,15 +51,9 @@ public class TreeViewer{
       ArrayList<TreeNode> tree;
       String json,file;
       
-      file="en";
-      file="light-test";
-      file="light-test-formatted";
-      file="3-programming";
-//      file="3-programming-formatted";
-      
       long time1,time2;
       time1=System.currentTimeMillis();
-      json=readJSON(file);
+      json=readJSON();
       time2=System.currentTimeMillis();
       System.out.println("Read time: "+formatTime((int) (time2-time1), "%.2f s") );
       
@@ -73,10 +68,8 @@ public class TreeViewer{
       return tree;
     }
     
-    public String readJSON(String file){
-      String doc = "", path; 
-      path="json/"+file+".json";
-      rootName=file;
+    public String readJSON(){
+      String doc = "";
       
       try {
         Path filePath = Paths.get(path);
@@ -148,7 +141,7 @@ public class TreeViewer{
       return timeFormat.toString();
     }
     
-    // time measure tmeplate
+    // time measure template
     private void showProcessTime(){
       long time1,time2;
       time1=System.currentTimeMillis();
@@ -166,6 +159,7 @@ public class TreeViewer{
   }
     
   public void showTree(){
+    path=window.tfPath.getText();
     TreeWorker worker=new TreeWorker();
     worker.addPropertyChangeListener(worker);
     worker.execute();
@@ -175,6 +169,7 @@ public class TreeViewer{
     if(treeData!=null){
       DirectoryTree tree=window.tree;
       
+      rootName=getNameFromPath();
       DirNode root=new DirNode(rootName, treeData);
       
       tree=new DirectoryTree(iconNames);
@@ -188,18 +183,59 @@ public class TreeViewer{
   public static String getIconFromNode(String iconPath){
     String icon=null;
     
-    Pattern pat=Pattern.compile("/[^/]+\\.[^/.]+$");
+    Pattern pat=Pattern.compile("/([^/]+\\.[^/.]+)$");
     Matcher mat=pat.matcher(iconPath);
     
     if(mat.find()){
-      icon=mat.group();                                      
-      icon=icon.substring(1);
+      icon=mat.group(1);                                      
     }
     else{
       icon="file.png";
     }
     
     return icon;
+  }
+  
+  public static String formatPath(String path) {
+    path=path.replace('\\', '/');
+    path=path.trim();
+    
+    int last=path.length()-1;
+    if(path.substring(last).equals("/"))
+      path=path.substring(0,last);
+    
+    return path;
+  }
+  
+  public String getNameFromPath(){
+    String name="";
+    
+    Pattern pat=Pattern.compile("/([^/]+)\\.[^/.]+$");
+    Matcher mat=pat.matcher(path);
+    
+    if(mat.find())
+      name=mat.group(1);
+    
+    return name;
+  }
+  
+  public static String getExt(String file){
+    String ext;
+    ext=regexFind("\\.([^.]+)$", file, 1);
+    ext=ext.toLowerCase();
+    return ext;
+  }
+  
+  public static String regexFind(String pattern, String text, int group){
+    String result="";
+    
+    Pattern pat=Pattern.compile(pattern);
+    Matcher mat=pat.matcher(text);
+    
+    if(mat.find())
+      result=mat.group(group);
+    
+    return result;
   }
   
 }

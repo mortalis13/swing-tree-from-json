@@ -9,14 +9,18 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileFilter;
 
 
 public class TreeViewerFrame {
@@ -24,16 +28,17 @@ public class TreeViewerFrame {
   public static TreeViewerFrame window;
   
   private JFrame frame;
-  public JButton btnNewButton;
-  public JTextField tfState;
+  public JButton bLoadTree;
+  public JTextField tfPath;
   public TreeViewer treeViewer;
   
   public DirectoryTree tree;
   public JScrollPane scrollPane;
   
-  public JTree justTree;
-  public JTree tree_1;
-
+  public JLabel lPath;
+  public JButton bBrowse;
+  public JFileChooser fc;
+  
   /**
    * Launch the application.
    */
@@ -91,47 +96,84 @@ public class TreeViewerFrame {
         treeViewer=new TreeViewer();
       }
     });
-    frame.setBounds(100, 100, 577, 503);
+    frame.setBounds(100, 100, 577, 535);
     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     GridBagLayout gbl = new GridBagLayout();
-    gbl.rowWeights = new double[]{1.0, 0.0, 0.0};
+    gbl.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0};
     gbl.columnWeights = new double[]{1.0};
     // gbl.rowWeights = new double[]{0.0, 0.0};
     frame.getContentPane().setLayout(gbl);
+    
+    lPath = new JLabel();
+    lPath.setBorder(new EmptyBorder(0, 5, 0, 0));
+    lPath.setText("Path");
+    GridBagConstraints gbc_lPath = new GridBagConstraints();
+    gbc_lPath.insets = new Insets(5, 5, 0, 5);
+    gbc_lPath.fill = GridBagConstraints.HORIZONTAL;
+    gbc_lPath.gridx = 0;
+    gbc_lPath.gridy = 0;
+    frame.getContentPane().add(lPath, gbc_lPath);
+    
+    tfPath = new JTextField();
+    tfPath.setMargin(new Insets(5, 5, 2, 5));
+    GridBagConstraints gbc_tfPath = new GridBagConstraints();
+    gbc_tfPath.ipady = 5;
+    gbc_tfPath.insets = new Insets(5, 5, 5, 5);
+    gbc_tfPath.ipadx = 5;
+    gbc_tfPath.fill = GridBagConstraints.HORIZONTAL;
+    gbc_tfPath.gridx = 0;
+    gbc_tfPath.gridy = 1;
+    frame.getContentPane().add(tfPath, gbc_tfPath);
+    
+    bBrowse = new JButton();
+    bBrowse.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        fc = new JFileChooser(".");
+        fc.setFileFilter(new CustomFilter());
+        int returnVal = fc.showOpenDialog(frame);
+        
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+          File file = fc.getSelectedFile();
+          String path=file.getPath();
+          path=TreeViewer.formatPath(path);
+          tfPath.setText(path);
+        } 
+      }
+    });
+    bBrowse.setText("Browse...");
+    GridBagConstraints gbc_bBrowse = new GridBagConstraints();
+    gbc_bBrowse.insets = new Insets(5, 0, 5, 5);
+    gbc_bBrowse.fill = GridBagConstraints.HORIZONTAL;
+    gbc_bBrowse.gridx = 1;
+    gbc_bBrowse.gridy = 1;
+    gbc_bBrowse.ipady = 3;
+    frame.getContentPane().add(bBrowse, gbc_bBrowse);
     
     scrollPane = new JScrollPane();
     GridBagConstraints gbc_scrollPane = new GridBagConstraints();
     gbc_scrollPane.insets = new Insets(5, 5, 5, 5);
     gbc_scrollPane.fill = GridBagConstraints.BOTH;
     gbc_scrollPane.gridx = 0;
-    gbc_scrollPane.gridy = 0;
+    gbc_scrollPane.gridy = 2;
+    gbc_scrollPane.gridwidth = 2;
     frame.getContentPane().add(scrollPane, gbc_scrollPane);
     
-    tfState = new JTextField();
-    GridBagConstraints gbc_tfState = new GridBagConstraints();
-    gbc_tfState.insets = new Insets(5, 5, 5, 5);
-    gbc_tfState.ipady = 5;
-    gbc_tfState.ipadx = 5;
-    gbc_tfState.fill = GridBagConstraints.HORIZONTAL;
-    gbc_tfState.gridx = 0;
-    gbc_tfState.gridy = 1;
-    frame.getContentPane().add(tfState, gbc_tfState);
-    
-    btnNewButton = new JButton("New button");
-    btnNewButton.addActionListener(new ActionListener() {
+    bLoadTree = new JButton("Load Tree");
+    bLoadTree.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         treeViewer.showTree();
       }
     });
     
-    GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
-    gbc_btnNewButton.ipady = 10;
-    gbc_btnNewButton.ipadx = 5;
-    gbc_btnNewButton.insets = new Insets(5, 5, 5, 5);
-    gbc_btnNewButton.fill = GridBagConstraints.HORIZONTAL;
-    gbc_btnNewButton.gridx = 0;
-    gbc_btnNewButton.gridy = 2;
-    frame.getContentPane().add(btnNewButton, gbc_btnNewButton);
+    GridBagConstraints gbc_bLoadTree = new GridBagConstraints();
+    gbc_bLoadTree.ipady = 20;
+    gbc_bLoadTree.ipadx = 5;
+    gbc_bLoadTree.insets = new Insets(5, 5, 5, 5);
+    gbc_bLoadTree.fill = GridBagConstraints.HORIZONTAL;
+    gbc_bLoadTree.gridx = 0;
+    gbc_bLoadTree.gridy = 3;
+    gbc_bLoadTree.gridwidth = 2;
+    frame.getContentPane().add(bLoadTree, gbc_bLoadTree);
   }
 
 }
